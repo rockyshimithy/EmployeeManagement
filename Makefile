@@ -11,7 +11,7 @@ help:
 	@echo '    make requirements_dev   Install required packages to Dev  '
 	@echo '    make unit               Run unit tests                    '
 	@echo '    make coverage           Run tests with coverage           '
-	@echo '    make cover-html         Return a coverage report on html  '
+	@echo '    make cover_html         Return a coverage report on html  '
 	@echo '    make migrate_db         Apply the migrations to db        '
 	@echo '    make runserver          Run the application               '
 	@echo '                                                              '
@@ -39,7 +39,7 @@ unit:clean
 coverage:clean
 	py.test --cov=$(MODULE_NAME) --cov-report term tests/
 
-cover-html:clean
+cover_html:clean
 	py.test --cov=$(MODULE_NAME) --cov-report html
 
 
