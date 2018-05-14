@@ -1,6 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import django_filters
 from .models import Employee
-#from rest_framework import filters
 
 
 class EmployeeFilter(django_filters.FilterSet):
