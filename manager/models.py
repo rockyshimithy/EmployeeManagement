@@ -7,8 +7,8 @@ from django.db import models
 class Employee(models.Model):
 
     name = models.CharField(max_length=200, verbose_name='Name')
-    email = models.CharField(max_length=200, verbose_name='E-mail', unique=True)
-    department = models.CharField(max_length=200, verbose_name='Department')
+    email = models.EmailField(max_length=200, verbose_name='E-mail', unique=True)
+    department = models.CharField(max_length=50, verbose_name='Department')
 
     class Meta:
         verbose_name = 'Employee'

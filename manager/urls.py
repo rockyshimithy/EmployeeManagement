@@ -13,8 +13,5 @@ urlpatterns = [
 
     #url(r'^employee/(?P<pk>[0-9]+)/$', views.EmployeeDetail.as_view(), name=views.EmployeeDetail.name),
     path('employee/<int:pk>/', views.EmployeeDetail.as_view(), name=views.EmployeeDetail.name),
-
-    #url(r'^$', views.ApiRoot.as_view(), name=views.ApiRoot.name),
-    path('', views.ApiRoot.as_view(), name=views.ApiRoot.name),
 ]
 
