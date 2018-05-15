@@ -2,3 +2,5 @@
 flake8
 ipython
 ipdb
+pytest
+pytest-django

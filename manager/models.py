@@ -13,7 +13,6 @@ class Employee(models.Model):
     class Meta:
         verbose_name = 'Employee'
         verbose_name_plural = 'Employees'
-        ordering = ["-name"]
 
     def __str__(self):
         return self.name
