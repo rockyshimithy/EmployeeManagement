@@ -31,6 +31,14 @@ def test_get_employee(client, employees):
 
 
 @pytest.mark.django_db
+def test_get_employee_that_does_not_exist(client):
+    response = client.get('/employee/999/')
+
+    assert response.status_code == 404
+    assert response.json()['detail'] == 'Not found.'
+
+
+@pytest.mark.django_db
 def test_post_employees():
     pass
 
