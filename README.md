@@ -156,7 +156,7 @@ Após isso, vá para a pasta raiz desse projeto (EmployeeManagement) e siga as i
     {"name":"Ada Lovelace","email":"ada@lovelace.com","department":"CTO"
     ```
 
-- Procura por employees usando qualquer um dos seguintes parâmetros (name, email, department)
+- Procura por Funcionários usando qualquer um dos seguintes parâmetros (name, email, department)
 
     ```shell
     $ curl -X GET http://127.0.0.1:8000/employees/?name=Roberto | python -m json.tool
