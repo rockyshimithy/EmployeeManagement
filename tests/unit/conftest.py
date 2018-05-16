@@ -2,41 +2,36 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+import factory.django
 
 from manager.models import Employee
 
 
+class EmployeeFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Employee
+
+    name = "Joao Lasanha"
+    email = "joao@lasanha.com"
+    department = "TI"
+
+
 @pytest.fixture()
 def employee():
-    employee = Employee.objects.create(
-        name='Joao Lasanha',
-        email='joao@lasanha.com',
-        department='TI'
-    )
-
-    return employee
+    return EmployeeFactory()
 
 
 @pytest.fixture()
 def employees(employee):
-    employees = []
-
-    employees.append(employee)
-
-    employees.append(
-        Employee.objects.create(name='Maria Carbonara', email='maria@carbonara.com', department='Design')
-    )
-    employees.append(
-        Employee.objects.create(name='Leonardo Almondega', email='leonardo@almondega.com', department='TI')
-    )
-    employees.append(
-        Employee.objects.create(name='Ada Bacon', email='ada@bacon.com', department='TI')
-    )
-    employees.append(
-        Employee.objects.create(name='Rafael Jalapeno', email='rafael@jalapeno.com', department='RH')
-    )
-    employees.append(
-        Employee.objects.create(name='Renata Pilsen', email='renata@pilsen.com', department='Design')
-    )
+    employees = [
+        employee,
+        EmployeeFactory(name='Maria Carbonara', email='maria@carbonara.com', department='Design'),
+        EmployeeFactory(name='Leonardo Almondega', email='leonardo@almondega.com', department='TI'),
+        EmployeeFactory(name='Ada Bacon', email='ada@bacon.com', department='TI'),
+        EmployeeFactory(name='Rafael Jalapeno', email='rafael@jalapeno.com', department='RH'),
+        EmployeeFactory(name='Renata Pilsen', email='renata@pilsen.com', department='Design')
+        ]
 
     return employees
+
+

@@ -1,6 +1,4 @@
 SHELL=/bin/bash
-MODULE_NAME:=EmployeeManagement
-
 
 help:
 	@echo 'Makefile for EmployeeManagement                               '
@@ -21,9 +19,7 @@ clean:
 	find . -iname *.pyc -delete
 	find . -iname *.pyo -delete
 	find . -iname __pycache__ -delete
-	rm -fr .coverage;
 	rm -fr .cache;
-	rm -fr htmlcov;
 
 
 requirements:
