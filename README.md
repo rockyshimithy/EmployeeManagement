@@ -192,7 +192,7 @@ $ make superuser
 
 Acesse a interface através da url http://127.0.0.1:8000/admin 
 
-# Para observar a cobertura dos testes, rode os seguintes comandos
+# Para observar os testes, rode o seguinte comando
 
 ```shell
 $ make unit
