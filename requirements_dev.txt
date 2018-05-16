@@ -2,5 +2,5 @@
 flake8
 ipython
 ipdb
-pytest
-pytest-django
+pytest == 3.5.1
+pytest-django == 3.2.1

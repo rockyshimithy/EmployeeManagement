@@ -5,6 +5,7 @@ import pytest
 
 from manager.models import Employee
 
+
 @pytest.fixture()
 def employee():
     employee = Employee.objects.create(
@@ -12,7 +13,9 @@ def employee():
         email='joao@lasanha.com',
         department='TI'
     )
+    
     return employee
+
 
 @pytest.fixture()
 def employees(employee):

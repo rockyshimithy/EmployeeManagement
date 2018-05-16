@@ -19,6 +19,42 @@ def test_get_employees(client, employees):
 
 
 @pytest.mark.django_db
+def test_get_employees_filtered_by_name(client, employees):
+    response = client.get('/employees/?name=Ada')
+
+    employee = Employee.objects.get(name='Ada Bacon')
+
+    assert response.status_code == 200
+    assert response.json()[0]['name'] == employee.name
+    assert response.json()[0]['email'] == employee.email
+    assert response.json()[0]['department'] == employee.department
+
+
+@pytest.mark.django_db
+def test_get_employees_filtered_by_email(client, employees):
+    response = client.get('/employees/?email=renata@pilsen.com')
+
+    employee = Employee.objects.get(email='renata@pilsen.com')
+
+    assert response.status_code == 200
+    assert response.json()[0]['name'] == employee.name
+    assert response.json()[0]['email'] == employee.email
+    assert response.json()[0]['department'] == employee.department
+
+
+@pytest.mark.django_db
+def test_get_employees_filtered_by_department(client, employees):
+    response = client.get('/employees/?department=TI')
+
+    employees = Employee.objects.filter(department='TI')
+
+    for i, employee in enumerate(employees):
+        assert response.json()[i]['name'] == employee.name
+        assert response.json()[i]['email'] == employee.email
+        assert response.json()[i]['department'] == employee.department
+
+
+@pytest.mark.django_db
 def test_get_employee(client, employees):
     response = client.get('/employee/2/')
 
