@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import pytest
 
 from manager.models import Employee
@@ -89,6 +90,16 @@ def test_failed_post_employee_with_empty_email(client):
 
 
 @pytest.mark.django_db
+def test_failed_post_employee_with_wrong_format_on_email(client):
+    data = {'name': 'Max Skywalker', 'email': 'tchurur.com', 'department': 'TI'}
+
+    response = client.post('/employees/', data=data)
+
+    assert response.status_code == 400
+    assert response.json()['email'][0] == 'Enter a valid email address.'
+
+
+@pytest.mark.django_db
 def test_failed_post_employee_with_empty_department(client):
     data = {'name': 'Max Skywalker', 'email': 'max@skywalker.com', 'department': ''}
 
@@ -144,3 +155,44 @@ def test_failed_delete_employee_not_found(client):
 
     assert response.status_code == 404
     assert response.json()['detail'] == 'Not found.'
+
+
+@pytest.mark.django_db
+def test_success_edit_employee_with_put(client, employees):
+    data = {'name': 'Joao Bolo de Cenoura', 'email': 'joao@bolodecenoura.com', 'department': 'IOT'}
+
+    response = client.put('/employee/1/', data=json.dumps(data), content_type='application/json')
+
+    employee = Employee.objects.filter(name='Joao Bolo de Cenoura')
+
+    assert response.status_code == 200
+    assert response.json()['name'] == employee[0].name
+    assert response.json()['email'] == employee[0].email
+    assert response.json()['department'] == employee[0].department
+
+
+@pytest.mark.django_db
+def test_failed_edit_employee_with_put_and_without_some_fields(client, employees):
+    data = {'name': 'Joao Bolo de Cenoura'}
+
+    response = client.put('/employee/1/', data=json.dumps(data), content_type='application/json')
+
+    employee = Employee.objects.filter(name='Joao Bolo de Cenoura')
+
+    assert response.status_code == 400
+    assert response.json()['email'][0] == 'This field is required.'
+    assert response.json()['department'][0] == 'This field is required.'
+
+
+@pytest.mark.django_db
+def test_success_edit_employee_with_patch(client, employees):
+    data = {'name': 'Joao Bolo de Cenoura'}
+
+    response = client.patch('/employee/1/', data=json.dumps(data), content_type='application/json')
+
+    employee = Employee.objects.filter(name='Joao Bolo de Cenoura')
+
+    assert response.status_code == 200
+    assert response.json()['name'] == employee[0].name
+    assert response.json()['email'] == employee[0].email
+    assert response.json()['department'] == employee[0].department
