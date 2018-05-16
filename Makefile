@@ -34,14 +34,11 @@ requirements_dev:
 
 
 unit:clean
-	py.test --cov=$(MODULE_NAME) --cov-report term tests/unit
+	py.test tests/ -v
 
-coverage:clean
-	py.test --cov=$(MODULE_NAME) --cov-report term tests/
 
-cover_html:clean
-	py.test --cov=$(MODULE_NAME) --cov-report html
-
+superuser:
+	python manage.py createsuperuser
 
 migrate_db:
 	python manage.py migrate

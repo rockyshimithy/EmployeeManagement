@@ -25,7 +25,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Employee',
                 'verbose_name_plural': 'Employees',
-                'ordering': ['-name'],
             },
         ),
     ]

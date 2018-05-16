@@ -9,7 +9,7 @@ from manager.models import Employee
 
 @pytest.mark.django_db
 def test_success_get_employees(client, employees):
-    response = client.get('/employees/')
+    response = client.get('/employees/', content_type='application/json')
 
     assert response.status_code == 200
 
@@ -21,7 +21,7 @@ def test_success_get_employees(client, employees):
 
 @pytest.mark.django_db
 def test_success_get_employees_filtered_by_name(client, employees):
-    response = client.get('/employees/?name=Ada')
+    response = client.get('/employees/?name=Ada', content_type='application/json')
 
     employee = Employee.objects.get(name='Ada Bacon')
 
@@ -33,7 +33,7 @@ def test_success_get_employees_filtered_by_name(client, employees):
 
 @pytest.mark.django_db
 def test_success_get_employees_filtered_by_email(client, employees):
-    response = client.get('/employees/?email=renata@pilsen.com')
+    response = client.get('/employees/?email=renata@pilsen.com', content_type='application/json')
 
     employee = Employee.objects.get(email='renata@pilsen.com')
 
@@ -45,7 +45,7 @@ def test_success_get_employees_filtered_by_email(client, employees):
 
 @pytest.mark.django_db
 def test_success_get_employees_filtered_by_department(client, employees):
-    response = client.get('/employees/?department=TI')
+    response = client.get('/employees/?department=TI', content_type='application/json')
 
     employees = Employee.objects.filter(department='TI')
 
@@ -59,7 +59,7 @@ def test_success_get_employees_filtered_by_department(client, employees):
 def test_success_post_employee(client):
     data = {'name': 'Max Skywalker', 'email': 'max@skywalker.com', 'department': 'TI'}
 
-    response = client.post('/employees/', data=data)
+    response = client.post('/employees/', data=json.dumps(data), content_type='application/json')
 
     employee = Employee.objects.get(name='Max Skywalker')
 
@@ -73,7 +73,7 @@ def test_success_post_employee(client):
 def test_failed_post_employee_with_empty_name(client):
     data = {'name': '', 'email': 'max@skywalker.com', 'department': 'TI'}
 
-    response = client.post('/employees/', data=data)
+    response = client.post('/employees/', data=json.dumps(data), content_type='application/json')
 
     assert response.status_code == 400
     assert response.json()['name'][0] == 'This field may not be blank.'
@@ -83,7 +83,7 @@ def test_failed_post_employee_with_empty_name(client):
 def test_failed_post_employee_with_empty_email(client):
     data = {'name': 'Max Skywalker', 'email': '', 'department': 'TI'}
 
-    response = client.post('/employees/', data=data)
+    response = client.post('/employees/', data=json.dumps(data), content_type='application/json')
 
     assert response.status_code == 400
     assert response.json()['email'][0] == 'This field may not be blank.'
@@ -93,7 +93,7 @@ def test_failed_post_employee_with_empty_email(client):
 def test_failed_post_employee_with_wrong_format_on_email(client):
     data = {'name': 'Max Skywalker', 'email': 'tchurur.com', 'department': 'TI'}
 
-    response = client.post('/employees/', data=data)
+    response = client.post('/employees/', data=json.dumps(data), content_type='application/json')
 
     assert response.status_code == 400
     assert response.json()['email'][0] == 'Enter a valid email address.'
@@ -103,7 +103,7 @@ def test_failed_post_employee_with_wrong_format_on_email(client):
 def test_failed_post_employee_with_empty_department(client):
     data = {'name': 'Max Skywalker', 'email': 'max@skywalker.com', 'department': ''}
 
-    response = client.post('/employees/', data=data)
+    response = client.post('/employees/', data=json.dumps(data), content_type='application/json')
 
     assert response.status_code == 400
     assert response.json()['department'][0] == 'This field may not be blank.'
@@ -113,7 +113,7 @@ def test_failed_post_employee_with_empty_department(client):
 def test_failed_post_employee_with_email_that_already_exists(client, employee):
     data = {'name': 'Joao Bolo de Cenoura', 'email': 'joao@lasanha.com', 'department': 'TI'}
 
-    response = client.post('/employees/', data=data)
+    response = client.post('/employees/', data=json.dumps(data), content_type='application/json')
 
     assert response.status_code == 400
     assert response.json()['email'][0] == 'Employee with this E-mail already exists.'
@@ -121,7 +121,7 @@ def test_failed_post_employee_with_email_that_already_exists(client, employee):
 
 @pytest.mark.django_db
 def test_success_get_employee(client, employees):
-    response = client.get('/employee/2/')
+    response = client.get('/employee/2/', content_type='application/json')
 
     assert response.status_code == 200
 
@@ -133,7 +133,7 @@ def test_success_get_employee(client, employees):
 
 @pytest.mark.django_db
 def test_failed_get_employee_that_does_not_exist(client):
-    response = client.get('/employee/999/')
+    response = client.get('/employee/999/', content_type='application/json')
 
     assert response.status_code == 404
     assert response.json()['detail'] == 'Not found.'
@@ -141,7 +141,7 @@ def test_failed_get_employee_that_does_not_exist(client):
 
 @pytest.mark.django_db
 def test_success_delete_employee(client, employees):
-    response = client.delete('/employee/1/')
+    response = client.delete('/employee/1/', content_type='application/json')
 
     employee = Employee.objects.filter(name='Joao Lasanha')
 
@@ -151,7 +151,7 @@ def test_success_delete_employee(client, employees):
 
 @pytest.mark.django_db
 def test_failed_delete_employee_not_found(client):
-    response = client.delete('/employee/1/')
+    response = client.delete('/employee/1/', content_type='application/json')
 
     assert response.status_code == 404
     assert response.json()['detail'] == 'Not found.'
@@ -176,8 +176,6 @@ def test_failed_edit_employee_with_put_and_without_some_fields(client, employees
     data = {'name': 'Joao Bolo de Cenoura'}
 
     response = client.put('/employee/1/', data=json.dumps(data), content_type='application/json')
-
-    employee = Employee.objects.filter(name='Joao Bolo de Cenoura')
 
     assert response.status_code == 400
     assert response.json()['email'][0] == 'This field is required.'
