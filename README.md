@@ -192,7 +192,15 @@ $ make superuser
 
 Acesse a interface através da url http://127.0.0.1:8000/admin 
 
-# Para observar os testes, rode o seguinte comando
+# Para observar os testes, rode os seguintes comandos
+
+Para instalar os requirements:
+
+```shell
+$ make requirements_dev
+```
+
+Para rodar os testes:
 
 ```shell
 $ make unit
