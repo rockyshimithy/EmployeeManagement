@@ -33,5 +33,3 @@ def employees(employee):
         ]
 
     return employees
-
-
