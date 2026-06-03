@@ -1,10 +1,10 @@
 *.pyc
 *~
 __pycache__/
-.idea/
 .cache
-.idea
 .coverage
 *.log*
 *.sqlite3
 .pytest_cache/
+python_cache/
+.venv/

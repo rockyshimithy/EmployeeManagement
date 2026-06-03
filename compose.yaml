@@ -1,0 +1,83 @@
+services:  
+  
+  python-dev:
+    image: ghcr.io/astral-sh/uv:python3.13-trixie-slim
+    container_name: python_dev
+    user: "1000:1000" # Run as a non-root user (1000:1000 is usually the standard host user UID)
+  
+    volumes:
+      - ./app:/app:ro # Mount your host code directory as strictly read-only
+      - ./python_cache:/home/uv/.local # Overlays a writable space directly inside the user home folder boundary for python packages
+    working_dir: /app
+  
+    tty: true
+    ports:
+      - "8000:8000"
+
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1 # Prevents Python from writing __pycache__ files to the read-only host filesystem
+      - PYTHONUNBUFFERED=1 # Forces logs to stream instantly to the console for real-time Docker debugging
+      - UV_LINK_MODE=copy # Crucial: Forces uv to copy dependencies cleanly into our volume overlays
+      - UV_CACHE_DIR=/home/uv/.local/.uv_cache # Forces uv caches inside our writable bind mount to bypass home folder root locks
+      - UV_PROJECT_ENVIRONMENT=/home/uv/.local/venv # Maps the virtual environment directly into our secure writable cache mount
+      - PATH=/home/uv/.local/venv/bin:$PATH # Drops our operational binary dependencies directly onto the system search path      
+      - DATABASE_URL=postgres://db_manager:5432@db:5432/employee_db # dj-database-url will automatically parse this environment variable to connect Django to Postgres
+
+
+    # Core Execution Loop:
+    # 1. Force the environment variable to be set at the terminal command level on boot
+    # 2. Checks if project is missing config files, initializes if needed
+    # 3. Syncs/Resolves dependencies cleanly, falling back to --frozen only if uv.lock exists
+    # 4. Fires up your Django development server 
+    command:  sh -c "
+                  export UV_LINK_MODE=copy && 
+                  if [ ! -f pyproject.toml ]; then uv init --no-workspace && uv add django djangorestframework; fi &&
+                  if [ -f uv.lock ]; then uv sync --frozen; else uv sync; fi &&
+                  uv run python manage.py migrate &&
+                  uv run python manage.py runserver 0.0.0.0:8000
+              "
+
+    security_opt: # Prevent the container from gaining new privileges
+      - no-new-privileges:true
+    cap_drop: # Extra Safety: Drops all default kernel privileges except what's needed
+      - ALL
+
+    depends_on:
+      db:
+        condition: service_healthy # Ensures Django doesn't boot until Postgres is fully ready to take queries
+
+
+
+
+
+  db:
+    image: postgres:16-alpine 
+    container_name: postgres_db
+    user: "70:70" # Runs under the internal postgres system user (never root)
+    
+    volumes:
+      - db_data:/var/lib/postgresql/data # Named volume ensures your database records are preserved locally* on your laptop
+      
+    environment:
+      - POSTGRES_DB=employee_db
+      - POSTGRES_USER=db_manager
+      - POSTGRES_PASSWORD=5432
+      - TZ=UTC
+      
+    security_opt: # Prevent the container from gaining new privileges
+      - no-new-privileges:true
+    cap_drop:  # Extra Safety: Drops all default kernel privileges except what's needed
+      - ALL
+    cap_add: # Postgres requires explicit chown/setuid/setgid flags internally to manage its data directories
+      - CHOWN 
+      - SETUID
+      - SETGID
+      
+    healthcheck: # Health checking system to let the python container know exactly when it is safe to connect
+      test: ["CMD-SHELL", "pg_isready -U db_manager -d employee_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data: # *Isolated, virtualized named volume managed by Docker for database stability
